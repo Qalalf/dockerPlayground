@@ -2,6 +2,7 @@ version : "3.8"
 
 services:
   api:
+    build: .
     image: baerhere/dotnetapi
     ports: 
       - 5000:5000
