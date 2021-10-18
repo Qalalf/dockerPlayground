@@ -15,12 +15,15 @@ namespace apiTest
         static private string databaseName = "test";
 
         static private MongoClient client = new MongoClient(connectionString);
-        IMongoDatabase database = client.GetDatabase(databaseName);
+        static private IMongoDatabase database = client.GetDatabase(databaseName);
+
+        IMongoCollection<Test> collection = database.GetCollection<Test>(collectionName);
 
         [TestMethod]
         public void TestDbConnectionSettings()
         {
             var isMongoLive = database.RunCommandAsync((Command<BsonDocument>)"{ping:1}").Wait(1000);
+            
             Assert.IsTrue(isMongoLive);
         }
     
@@ -35,10 +38,9 @@ namespace apiTest
                 size = "size 1",
             };
 
-            var data = database.GetCollection<Test>("inventory");
             try 
             {
-                data.InsertOne(testdata);
+                collection.InsertOne(testdata);
                 Assert.IsTrue(true);
             } catch (Exception e) {
                 Assert.IsNull(e);
@@ -46,10 +48,8 @@ namespace apiTest
         }
 
         [TestMethod]
-        public void TestDbGetFromItem()
+        public void TestDbQueryDocument()
         {
-            var collection = database.GetCollection<Test>(collectionName);
-
             var filter = Builders<Test>.Filter.Eq("item", "item");
             var result = collection.Find(filter).ToList();
 
@@ -57,12 +57,21 @@ namespace apiTest
         }
 
         [TestMethod]
-        public void TestDbRemoveItem()
+        public void TestDbUpdateDocument()
         {
-            var collection = database.GetCollection<Test>(collectionName);
             var filter = Builders<Test>.Filter.Eq("item", "item");
+            var update = Builders<Test>.Update.Set("item", "itemUpdated");
+            var result = collection.UpdateOne(filter, update);
+            
+            Assert.IsTrue(result.ModifiedCount > 0);
+        }
 
+        [TestMethod]
+        public void TestDbDeleteIDocument()
+        {
+            var filter = Builders<Test>.Filter.Eq("item", "itemUpdated");
             var result = collection.DeleteMany(filter);
+            
             Assert.IsTrue(result.DeletedCount > 0);
         }
     }
