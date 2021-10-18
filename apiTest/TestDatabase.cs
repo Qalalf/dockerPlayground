@@ -38,13 +38,30 @@ namespace apiTest
                 size = "size 1",
             };
 
+            Test testdata2 = new Test()
+            {
+                item = "item2",
+                qty = 2,
+                tags = "tags",
+                size = "size 2",
+            };
+
             try 
             {
                 collection.InsertOne(testdata);
+                collection.InsertOne(testdata2);
                 Assert.IsTrue(true);
             } catch (Exception e) {
                 Assert.IsNull(e);
             }
+        }
+        [TestMethod]
+        public void TestDbQueryAllDocuments()
+        {
+            var filter = Builders<Test>.Filter.Empty;
+            var result = collection.Find(filter).ToList();
+           // var result = collection.Find(Test => true).ToList();
+
         }
 
         [TestMethod]
@@ -67,9 +84,18 @@ namespace apiTest
         }
 
         [TestMethod]
-        public void TestDbDeleteIDocument()
+        public void TestDbDeleteDocument()
         {
             var filter = Builders<Test>.Filter.Eq("item", "itemUpdated");
+            var result = collection.DeleteMany(filter);
+            
+            Assert.IsTrue(result.DeletedCount > 0);
+        }
+
+        [TestMethod]
+        public void TestDbDeleteAllDocuments()
+        {
+            var filter = Builders<Test>.Filter.Empty;
             var result = collection.DeleteMany(filter);
             
             Assert.IsTrue(result.DeletedCount > 0);
