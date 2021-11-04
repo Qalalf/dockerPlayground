@@ -36,7 +36,7 @@ namespace api
             services.AddSingleton<IMongoDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<MongoDatabaseSettings>>().Value);
 
-            services.AddSingleton<TestService>();
+            services.AddSingleton<HabitItemService>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
